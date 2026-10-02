@@ -2,20 +2,25 @@
 
 Веб-приложение для бронирования столиков в ресторанах.
 
-## Быстрый старт (Docker)
+## Быстрый старт
 
+```bash
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate --seed
+npm install && npm run dev
+php artisan serve
 ```
-docker compose up
+
+## Требования
+
+```bash
+php -v        
+composer -V
+node -v
+npm -v
 ```
-
-## Ручной запуск (без Docker)
-
-### Требования
-
-`php -v`
-`composer -V`
-`node -v` |
-`npm -v` |
 
 ### Обязательные PHP-расширения
 
@@ -23,25 +28,14 @@ docker compose up
 extension=pdo_sqlite
 extension=sqlite3
 ```
-### Запуск (два терминала)
 
-**Терминал 1 - Backend:**
-```bash
-cd backend
-php artisan serve
-# → http://127.0.0.1:8000
-```
+## Тестовые учётки
 
-**Терминал 2 - Frontend:**
-```bash
-cd frontend
-npm run dev
-# → http://localhost:5173
-```
+| Роль | Email | Пароль |
+|---|---|---|
+| Админ | admin@example.com | password |
+| Клиент | petr@example.com | password |
 
 ## Проверка работы
-Открой http://localhost:5173 - увидишь React-приложение, которое общается с Laravel API через прокси `/api`.
 
-
-
-
+http://127.0.0.1:8000
