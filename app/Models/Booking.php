@@ -13,12 +13,10 @@ class Booking extends Model
         'slot_id',
         'booking_date',
         'status',
-        'total_price',
     ];
 
     protected $casts = [
         'booking_date' => 'date',
-        'total_price'  => 'decimal:2',
     ];
 
     public function user()
@@ -39,10 +37,5 @@ class Booking extends Model
     public function slot()
     {
         return $this->belongsTo(TimeSlot::class, 'slot_id');
-    }
-
-    public function payments()
-    {
-        return $this->hasMany(Payment::class);
     }
 }

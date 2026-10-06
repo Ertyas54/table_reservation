@@ -3,8 +3,8 @@
 namespace App\Livewire\Restaurants;
 
 use App\Models\Restaurant;
-use Livewire\Component;
 use Illuminate\Validation\Rule;
+use Livewire\Component;
 
 class RestaurantForm extends Component
 {

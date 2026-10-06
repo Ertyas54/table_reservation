@@ -2,10 +2,13 @@
 
 namespace App\Livewire\Tables;
 
+use App\Exceptions\BookingException;
 use App\Models\Booking;
 use App\Models\Restaurant;
 use App\Models\RestaurantTable;
 use App\Models\TimeSlot;
+use App\Models\User;
+use App\Services\BookingService;
 use Livewire\Component;
 
 class TableList extends Component
@@ -24,59 +27,52 @@ class TableList extends Component
         $table = RestaurantTable::where('restaurant_id', $this->restaurant->id)
             ->findOrFail($tableId);
 
+        $hasActiveBookings = $table->bookings()
+            ->exists();
+
+        if ($hasActiveBookings) {
+            session()->flash('error', 'Нельзя удалить столик — есть активные брони');
+            return;
+        }
+
         $table->delete();
     }
 
     public function book(int $tableId, int $slotId): void
     {
-        $table = RestaurantTable::where('restaurant_id', $this->restaurant->id)
-            ->findOrFail($tableId);
+        $user = auth()->user();
 
-        if (!$table->is_active) {
-            session()->flash('error', 'Этот столик сейчас недоступен для брони');
+        if (!$user instanceof User) {
             return;
         }
 
-        $exists = Booking::where('table_id', $tableId)
-            ->where('slot_id', $slotId)
-            ->where('booking_date', $this->bookingDate)
-            ->whereIn('status', ['pending', 'confirmed'])
-            ->exists();
+        try {
+            $table = RestaurantTable::where('restaurant_id', $this->restaurant->id)
+                ->findOrFail($tableId);
 
-        if ($exists) {
-            session()->flash('error', 'Этот слот уже занят');
-            return;
+            $slot = TimeSlot::where('restaurant_id', $this->restaurant->id)
+                ->findOrFail($slotId);
+
+            app(BookingService::class)->create($user, $table, $slot, $this->bookingDate);
+        } catch (BookingException $e) {
+            session()->flash('error', $e->getMessage());
         }
-
-        Booking::create([
-            'user_id' => auth()->id(),
-            'restaurant_id' => $this->restaurant->id,
-            'table_id' => $tableId,
-            'slot_id' => $slotId,
-            'booking_date' => $this->bookingDate,
-            'status' => 'pending',
-            'total_price' => 0,
-        ]);
-
-        session()->flash('message', 'Столик забронирован');
     }
 
     public function cancel(int $tableId, int $slotId): void
     {
-        $booking = Booking::where('table_id', $tableId)
-            ->where('slot_id', $slotId)
-            ->where('booking_date', $this->bookingDate)
-            ->where('user_id', auth()->id())
-            ->whereIn('status', ['pending', 'confirmed'])
-            ->first();
+        $user = auth()->user();
 
-        if (!$booking) {
-            session()->flash('error', 'Бронь не найдена');
+        if (!$user instanceof User) {
             return;
         }
 
-        $booking->update(['status' => 'cancelled']);
-        session()->flash('message', 'Бронь отменена');
+        try {
+            app(BookingService::class)->cancel($tableId, $slotId, $this->bookingDate, $user);
+        } catch (BookingException $e) {
+            session()->flash('error', $e->getMessage());
+        }
+
     }
 
     public function render()
@@ -92,7 +88,7 @@ class TableList extends Component
 
         $bookings = Booking::where('restaurant_id', $this->restaurant->id)
             ->where('booking_date', $this->bookingDate)
-            ->whereIn('status', ['pending', 'confirmed'])
+            ->where('status', 'confirmed')
             ->get()
             ->keyBy(fn($b) => $b->table_id . '-' . $b->slot_id);
 

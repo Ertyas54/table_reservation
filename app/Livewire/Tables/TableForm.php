@@ -4,8 +4,8 @@ namespace App\Livewire\Tables;
 
 use App\Models\Restaurant;
 use App\Models\RestaurantTable;
-use Livewire\Component;
 use Illuminate\Validation\Rule;
+use Livewire\Component;
 
 class TableForm extends Component
 {
@@ -46,6 +46,7 @@ class TableForm extends Component
 
     public function save(): void
     {
+
         $validated = $this->validate();
 
         if ($this->table) {

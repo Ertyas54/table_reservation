@@ -12,7 +12,6 @@ class RestaurantList extends Component
         $restaurant = Restaurant::findOrFail($restaurantId);
 
         $hasActiveBookings = $restaurant->bookings()
-            ->whereIn('status', ['pending', 'confirmed'])
             ->exists();
 
         if ($hasActiveBookings) {
