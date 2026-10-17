@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Http\Services;
 
 use App\Exceptions\BookingException;
 use App\Models\Booking;
@@ -28,7 +28,7 @@ class BookingService
         return DB::transaction(function () use ($user, $table, $slot, $date) {
             $exists = Booking::where('table_id', $table->id)
                 ->where('slot_id', $slot->id)
-                ->where('booking_date', $date)
+                ->whereDate('booking_date', $date)
                 ->where('status', 'confirmed')
                 ->lockForUpdate()
                 ->exists();
@@ -52,7 +52,7 @@ class BookingService
     {
         $booking = Booking::where('table_id', $tableId)
             ->where('slot_id', $slotId)
-            ->where('booking_date', $bookingDate)
+            ->whereDate('booking_date', $bookingDate)
             ->where('user_id', auth()->id())
             ->where('status', 'confirmed')
             ->first();

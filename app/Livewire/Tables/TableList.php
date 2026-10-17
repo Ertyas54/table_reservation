@@ -2,13 +2,13 @@
 
 namespace App\Livewire\Tables;
 
-use App\Exceptions\BookingException;
+use App\Http\Exceptions\BookingException;
 use App\Models\Booking;
 use App\Models\Restaurant;
 use App\Models\RestaurantTable;
 use App\Models\TimeSlot;
 use App\Models\User;
-use App\Services\BookingService;
+use App\Http\Services\BookingService;
 use Livewire\Component;
 
 class TableList extends Component
@@ -24,6 +24,9 @@ class TableList extends Component
 
     public function delete(int $tableId): void
     {
+        if (auth()->user()->role !== 'admin') {
+            abort(403);
+        }
         $table = RestaurantTable::where('restaurant_id', $this->restaurant->id)
             ->findOrFail($tableId);
 
@@ -87,7 +90,7 @@ class TableList extends Component
             ->get();
 
         $bookings = Booking::where('restaurant_id', $this->restaurant->id)
-            ->where('booking_date', $this->bookingDate)
+            ->whereDate('booking_date', $this->bookingDate)
             ->where('status', 'confirmed')
             ->get()
             ->keyBy(fn($b) => $b->table_id . '-' . $b->slot_id);
