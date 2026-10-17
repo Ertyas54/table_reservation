@@ -18,6 +18,10 @@ class TableForm extends Component
 
     public function mount(Restaurant $restaurant, ?RestaurantTable $table = null): void
     {
+        if (auth()->user()->role !== 'admin') {
+            abort(403);
+        }
+
         $this->restaurant = $restaurant;
 
         if ($table) {
@@ -46,6 +50,9 @@ class TableForm extends Component
 
     public function save(): void
     {
+        if (auth()->user()->role !== 'admin') {
+            abort(403);
+        }
 
         $validated = $this->validate();
 

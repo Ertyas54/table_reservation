@@ -19,9 +19,11 @@
                        value="{{ $bookingDate }}">
             </label>
 
-            <a href="{{ route('tables.create', $restaurant) }}" class="btn btn--primary">
-                + Добавить столик
-            </a>
+            @if(auth()->user()->role === 'admin')
+                <a href="{{ route('tables.create', $restaurant) }}" class="btn btn--primary">
+                    + Добавить столик
+                </a>
+            @endif
         </div>
     </div>
 
@@ -61,17 +63,18 @@
                     @endif
                 </div>
 
-                <div class="table-card__actions">
-                    <a href="{{ route('tables.edit', [$restaurant, $table]) }}"
-                       class="btn btn--ghost">
-                        Редактировать
-                    </a>
-                    <button wire:click="delete({{ $table->id }})"
-                            wire:confirm="Удалить столик?"
-                            class="btn btn--danger">
-                        Удалить
-                    </button>
-                </div>
+                @if(auth()->user()->role === 'admin')
+                    <div class="table-card__actions">
+                        <a href="{{ route('tables.edit', [$restaurant, $table]) }}" class="btn btn--ghost">
+                            Редактировать
+                        </a>
+                        <button wire:click="delete({{ $table->id }})"
+                                wire:confirm="Удалить столик?"
+                                class="btn btn--danger">
+                            Удалить
+                        </button>
+                    </div>
+                @endif
             </div>
 
             <div class="table-card__slots">
@@ -93,28 +96,27 @@
 
                         <span wire:key="cell-{{ $key }}">
                             @if ($isDisabled)
-                                <span class="slot slot--disabled" title="Недоступно">
+                                <span wire:key="disabled-{{ $key }}" class="slot slot--disabled" title="Недоступно">
                                     {{ $time }}
                                 </span>
                             @elseif (!$booking)
-                                <button wire:click="book({{ $table->id }}, {{ $timeSlot->id }})"
+                                <button wire:key="free-{{ $key }}"
+                                        wire:click="book({{ $table->id }}, {{ $timeSlot->id }})"
                                         class="slot">
                                     {{ $time }}
                                 </button>
                             @elseif ($isMine)
-                                <button wire:click="cancel({{ $table->id }}, {{ $timeSlot->id }})"
+                                <button wire:key="mine-{{ $key }}"
+                                        wire:click="cancel({{ $table->id }}, {{ $timeSlot->id }})"
                                         wire:confirm="Отменить бронь?"
                                         class="slot slot--mine">
                                     {{ $time }}
                                     <span class="slot__mine-label">(моя)</span>
                                 </button>
                             @else
-                                <span class="slot slot--taken">
-                                    {{ $time }}
-                                </span>
+                                <span wire:key="taken-{{ $key }}" class="slot slot--taken">{{ $time }}</span>
                             @endif
-                        </span>
-                    @empty
+                        </span>                    @empty
                         <span class="slots-empty">Слотов нет</span>
                     @endforelse
                 </div>

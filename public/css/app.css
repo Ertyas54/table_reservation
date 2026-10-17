@@ -590,3 +590,224 @@ a:hover {
 .form-card--wide {
     max-width: 720px;
 }
+
+/* USERS */
+
+/* Фильтры */
+.filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.filters__input,
+.filters__select {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-family: inherit;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.filters__input {
+    width: 280px;
+}
+
+.filters__select {
+    min-width: 180px;
+}
+
+.filters__input:focus,
+.filters__select:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* Сетка плиток */
+.users-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+/* Плитка */
+.user-card {
+    position: relative;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    height: 176px;
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+}
+
+.user-card:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Видимая часть */
+.user-card__main {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    height: 100%;
+}
+
+.user-card__avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 18px;
+    color: #fff;
+    flex-shrink: 0;
+}
+
+.user-card__avatar--admin { background: #9333ea; }
+.user-card__avatar--client { background: #6366f1; }
+
+.user-card__info {
+    min-width: 0;
+    flex: 1;
+}
+
+.user-card__name {
+    font-weight: 600;
+    color: #111827;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.user-card__id {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.user-card__id-value {
+    font-family: ui-monospace, monospace;
+}
+
+/* Выпадающая панель */
+.user-card__overlay {
+    position: absolute;
+    inset: 0;
+    background: #0f172a;
+    color: #fff;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transform: translateY(100%);
+    transition: transform 0.3s ease-out;
+    z-index: 10;
+}
+
+.user-card:hover .user-card__overlay {
+    transform: translateY(0);
+}
+
+.user-card__overlay-name {
+    font-weight: 600;
+    font-size: 15px;
+    margin-bottom: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.user-card__row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 12px;
+    margin-bottom: 4px;
+}
+
+.user-card__label {
+    color: #94a3b8;
+    width: 48px;
+    flex-shrink: 0;
+}
+
+.user-card__value {
+    word-break: break-all;
+}
+
+/* Бейдж роли */
+.user-role-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.user-role-badge--admin { background: #9333ea; color: #fff; }
+.user-role-badge--client { background: #475569; color: #fff; }
+
+/* Кнопки в overlay */
+.user-card__actions {
+    display: flex;
+    gap: 8px;
+    padding-top: 8px;
+}
+
+.user-card__actions .btn {
+    flex: 1;
+    justify-content: center;
+    padding: 8px 12px;
+    font-size: 12px;
+}
+
+.user-card__actions .btn--danger {
+    background: #dc2626;
+    color: #fff;
+}
+
+.user-card__actions .btn--danger:hover {
+    background: #b91c1c;
+}
+
+.user-card__blocked {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 8px;
+    background: #334155;
+    color: #94a3b8;
+    cursor: not-allowed;
+}
+
+/* Форма в Edit */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+@media (max-width: 640px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.form-field__hint {
+    font-size: 12px;
+    color: #9ca3af;
+    font-weight: 400;
+    margin-left: 4px;
+}
