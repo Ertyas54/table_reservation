@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string("last_name", 50);
             $table->string("email", 255)->unique();
             $table->string("phone", 20);
-            $table->string('password_hash', 255);
+            $table->string('password', 255);
             $table->string('role', 10)->default('client');
             $table->timestampsTz();
         });

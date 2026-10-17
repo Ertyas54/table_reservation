@@ -14,7 +14,7 @@ class UserSeeder extends Seeder
             'last_name'     => 'Админов',
             'email'         => 'admin@example.com',
             'phone'         => '+79000000001',
-            'password_hash' => bcrypt('password'),
+            'password' => bcrypt('password'),
             'role'          => 'admin',
         ]);
 
@@ -31,7 +31,7 @@ class UserSeeder extends Seeder
                 'last_name'     => $last,
                 'email'         => $email,
                 'phone'         => $phone,
-                'password_hash' => bcrypt('password'),
+                'password' => bcrypt('password'),
                 'role'          => 'client',
             ]);
         }

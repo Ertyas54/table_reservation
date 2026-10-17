@@ -14,12 +14,12 @@ class User extends Authenticatable
         'last_name',
         'email',
         'phone',
-        'password_hash',
+        'password',
         'role',
     ];
 
     protected $hidden = [
-        'password_hash',
+        'password',
     ];
 
     public function bookings() {
@@ -27,8 +27,5 @@ class User extends Authenticatable
     }
     public function isManager(): bool {
         return $this->role === 'manager';
-    }
-    public function getAuthPassword() {
-        return $this->password_hash;
     }
 }
