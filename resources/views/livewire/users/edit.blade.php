@@ -49,10 +49,12 @@
 
             <div class="form-row">
                 <div class="form-field">
-                    <label class="form-field__label">
-                        Новый пароль
-                        <span class="form-field__hint">(оставьте пустым, чтобы не менять)</span>
-                    </label>
+                    <div class="form-field__label-row">
+                        <label class="form-field__label">Новый пароль</label>
+                        <span class="info-tip">i
+                            <span class="info-tip__bubble">Оставьте пустым, чтобы не менять</span>
+                        </span>
+                    </div>
                     <input type="password" wire:model="password"
                            class="form-field__input @error('password') form-field__input--error @enderror">
                     @error('password') <div class="form-field__error">{{ $message }}</div> @enderror

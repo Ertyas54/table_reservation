@@ -9,6 +9,10 @@ class RestaurantList extends Component
 {
     public function delete(int $restaurantId): void
     {
+        if (auth()->user()->role !== 'admin') {
+            abort(403);
+        }
+
         $restaurant = Restaurant::findOrFail($restaurantId);
 
         $hasActiveBookings = $restaurant->bookings()

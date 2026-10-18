@@ -811,3 +811,107 @@ a:hover {
     font-weight: 400;
     margin-left: 4px;
 }
+
+.form-field__label-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
+.form-field__label-row .form-field__label {
+    margin-bottom: 0;
+}
+
+.info-tip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #cbd5e1;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    font-style: italic;
+    font-family: Georgia, serif;
+    cursor: help;
+    user-select: none;
+    transition: background 0.15s;
+}
+
+.info-tip:hover {
+    background: #64748b;
+}
+
+.info-tip__bubble {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #0f172a;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 400;
+    font-style: normal;
+    font-family: inherit;
+    padding: 8px 12px;
+    border-radius: 6px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 20;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.info-tip__bubble::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: #0f172a;
+}
+
+.info-tip:hover .info-tip__bubble {
+    opacity: 1;
+}
+
+.btn--soft {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+}
+
+.btn--soft:hover {
+    background: #e2e8f0;
+    border-color: #cbd5e1;
+}
+
+.btn--soft-blue {
+    background: #f1f5f9;
+    color: #2563eb;
+    border: 1px solid #e2e8f0;
+}
+
+.btn--soft-blue:hover {
+    background: #e2e8f0;
+    color: #1d4ed8;
+    border-color: #bfdbfe;
+}
+
+.btn--soft-red {
+    background: #f1f5f9;
+    color: #dc2626;
+    border: 1px solid #e2e8f0;
+}
+
+.btn--soft-red:hover {
+    background: #e2e8f0;
+    color: #b91c1c;
+    border-color: #fecaca;
+}

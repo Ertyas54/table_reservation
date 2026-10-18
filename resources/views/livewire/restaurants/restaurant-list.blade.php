@@ -5,9 +5,11 @@
         <div>
             <h1 class="page-header__title">Рестораны</h1>
         </div>
+        @if(auth()->user()->role === 'admin')
         <a href="{{ route('restaurants.create') }}" class="btn btn--primary">
             + Добавить ресторан
         </a>
+        @endif
     </div>
 
     @if (session('message'))
@@ -98,6 +100,7 @@
                             </div>
                         @endif
 
+                        @if(auth()->user()->role === 'admin')
                         <div class="restaurant-card__actions-secondary">
                             <a href="{{ route('restaurants.edit', $restaurant) }}" class="btn btn--ghost">
                                 Редактировать
@@ -106,7 +109,7 @@
                                     wire:confirm="Удалить ресторан?" class="btn btn--danger">
                                 Удалить
                             </button>
-                        </div>
+                        </div>@endif
                     </div>
                 </div>
             @endforeach

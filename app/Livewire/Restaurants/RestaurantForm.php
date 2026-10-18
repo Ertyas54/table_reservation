@@ -56,6 +56,9 @@ class RestaurantForm extends Component
 
     public function save(): void
     {
+        if (auth()->user()->role !== 'admin') {
+            abort(403);
+        }
         $validated = $this->validate();
 
         if ($this->restaurant) {

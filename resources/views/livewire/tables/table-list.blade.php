@@ -125,10 +125,12 @@
     @empty
         <div class="empty-state">
             <div class="empty-state__title">Столиков пока нет</div>
+            @if(auth()->user()->role === 'admin')
             <div class="empty-state__text">Добавьте первый столик, чтобы начать</div>
             <a href="{{ route('tables.create', $restaurant) }}" class="btn btn--primary">
                 + Добавить столик
             </a>
+            @endif
         </div>
     @endforelse
 </div>

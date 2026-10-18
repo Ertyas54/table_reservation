@@ -70,7 +70,7 @@
                         </div>
 
                         <div class="user-card__actions">
-                            <a href="{{ route('users.edit', $user) }}" class="btn btn--primary">
+                            <a href="{{ route('users.edit', $user) }}" class="btn btn--soft-blue">
                                 Редактировать
                             </a>
 
@@ -82,7 +82,7 @@
                                 @else
                                     <button wire:click="delete({{ $user->id }})"
                                             wire:confirm="Удалить пользователя {{ $user->email }}?"
-                                            class="btn btn--danger">
+                                            class="btn btn--soft-red">
                                         Удалить
                                     </button>
                                 @endif
