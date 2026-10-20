@@ -25,7 +25,5 @@ class User extends Authenticatable
     public function bookings() {
         return $this->hasMany(Booking::class);
     }
-    public function isManager(): bool {
-        return $this->role === 'manager';
-    }
+
 }

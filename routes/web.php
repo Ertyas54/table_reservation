@@ -27,7 +27,6 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('admin')->group(function () {
         Route::get('/restaurants/create', RestaurantForm::class)->name('restaurants.create');
-        Route::get('/restaurants/delete', RestaurantForm::class)->name('restaurants.delete');
         Route::get('/restaurants/{restaurant}/edit', RestaurantForm::class)->name('restaurants.edit');
 
         Route::get('/restaurants/{restaurant}/tables/create', TableForm::class)->name('tables.create');
