@@ -1,6 +1,6 @@
 @php use Carbon\Carbon; @endphp
 
-<div>
+<div wire:poll.60s>
     <div class="page-header">
         <div>
             <h1 class="page-header__title">
@@ -16,7 +16,8 @@
                 <span>Дата:</span>
                 <input type="date"
                        wire:model.live="bookingDate"
-                       value="{{ $bookingDate }}">
+                       value="{{ $bookingDate }}"
+                       min="{{ now()->toDateString() }}">
             </label>
 
             @if(auth()->user()->role === 'admin')
@@ -91,12 +92,13 @@
                             $time = Carbon::parse($timeSlot->start_time)->format('H:i')
                                   . '–'
                                   . Carbon::parse($timeSlot->end_time)->format('H:i');
-                            $isDisabled = !$table->is_active || !$timeSlot->is_active;
+                            $isPast = $isToday && $pastSlots->contains($timeSlot->id);
+                            $isDisabled = !$table->is_active || !$timeSlot->is_active || $isPast;
                         @endphp
 
                         <span wire:key="cell-{{ $key }}">
                             @if ($isDisabled)
-                                <span wire:key="disabled-{{ $key }}" class="slot slot--disabled" title="Недоступно">
+                                <span class="slot slot--disabled" title="{{ $isPast ? 'Время прошло' : 'Недоступно' }}">
                                     {{ $time }}
                                 </span>
                             @elseif (!$booking)

@@ -2,7 +2,7 @@
 
 namespace App\Http\Services;
 
-use App\Exceptions\BookingException;
+use App\Http\Exceptions\BookingException;
 use App\Models\Booking;
 use App\Models\RestaurantTable;
 use App\Models\TimeSlot;

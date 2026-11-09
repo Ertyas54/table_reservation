@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Tables;
 
+use App\Http\Services\TimeSlotGenerator;
 use App\Models\Restaurant;
 use App\Models\RestaurantTable;
 use Illuminate\Validation\Rule;
@@ -48,12 +49,8 @@ class TableForm extends Component
         ];
     }
 
-    public function save(): void
+    public function save(TimeSlotGenerator $generator): void
     {
-        if (auth()->user()->role !== 'admin') {
-            abort(403);
-        }
-
         $validated = $this->validate();
 
         if ($this->table) {
@@ -62,9 +59,12 @@ class TableForm extends Component
             $this->restaurant->tables()->create($validated);
         }
 
+        if ($this->restaurant->timeSlots()->count() === 0) {
+            $generator->generateForRestaurant($this->restaurant);
+        }
+
         $this->redirectRoute('tables.index', ['restaurant' => $this->restaurant->id]);
     }
-
     public function render()
     {
         return view('livewire.tables.table-form');

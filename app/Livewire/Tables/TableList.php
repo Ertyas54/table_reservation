@@ -9,6 +9,7 @@ use App\Models\RestaurantTable;
 use App\Models\TimeSlot;
 use App\Models\User;
 use App\Http\Services\BookingService;
+use Carbon\Carbon;
 use Livewire\Component;
 
 class TableList extends Component
@@ -89,6 +90,16 @@ class TableList extends Component
             ->orderBy('start_time')
             ->get();
 
+        $now = now();
+        $isToday = $this->bookingDate === $now->toDateString();
+
+        $pastSlots = collect();
+        if ($isToday) {
+            $pastSlots = $timeSlots->filter(function ($slot) use ($now) {
+                return Carbon::parse($slot->start_time)->format('H:i') <= $now->format('H:i');
+            })->pluck('id');
+        }
+
         $bookings = Booking::where('restaurant_id', $this->restaurant->id)
             ->whereDate('booking_date', $this->bookingDate)
             ->where('status', 'confirmed')
@@ -96,9 +107,11 @@ class TableList extends Component
             ->keyBy(fn($b) => $b->table_id . '-' . $b->slot_id);
 
         return view('livewire.tables.table-list', [
-            'tables' => $tables,
+            'tables'    => $tables,
             'timeSlots' => $timeSlots,
-            'bookings' => $bookings,
+            'bookings'  => $bookings,
+            'pastSlots' => $pastSlots,
+            'isToday' => $isToday,
         ]);
     }
 }
