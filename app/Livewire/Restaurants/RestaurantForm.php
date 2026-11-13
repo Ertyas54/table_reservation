@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Restaurants;
 
+use App\Http\Services\TimeSlotGenerator;
 use App\Models\Restaurant;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
@@ -54,7 +55,7 @@ class RestaurantForm extends Component
         ];
     }
 
-    public function save(): void
+    public function save(TimeSlotGenerator $generator): void
     {
         if (auth()->user()->role !== 'admin') {
             abort(403);
@@ -63,8 +64,10 @@ class RestaurantForm extends Component
 
         if ($this->restaurant) {
             $this->restaurant->update($validated);
+            $generator->generateForRestaurant($this->restaurant);
         } else {
-            Restaurant::create($validated);
+            $restaurant = Restaurant::create($validated);
+            $generator->generateForRestaurant($restaurant);
         }
 
         $this->redirectRoute('restaurants.index');

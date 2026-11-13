@@ -2,13 +2,10 @@
 
 namespace App\Livewire\Tables;
 
-use App\Http\Exceptions\BookingException;
 use App\Models\Booking;
 use App\Models\Restaurant;
 use App\Models\RestaurantTable;
 use App\Models\TimeSlot;
-use App\Models\User;
-use App\Http\Services\BookingService;
 use Livewire\Component;
 
 class TableList extends Component
@@ -41,43 +38,6 @@ class TableList extends Component
         $table->delete();
     }
 
-    public function book(int $tableId, int $slotId): void
-    {
-        $user = auth()->user();
-
-        if (!$user instanceof User) {
-            return;
-        }
-
-        try {
-            $table = RestaurantTable::where('restaurant_id', $this->restaurant->id)
-                ->findOrFail($tableId);
-
-            $slot = TimeSlot::where('restaurant_id', $this->restaurant->id)
-                ->findOrFail($slotId);
-
-            app(BookingService::class)->create($user, $table, $slot, $this->bookingDate);
-        } catch (BookingException $e) {
-            session()->flash('error', $e->getMessage());
-        }
-    }
-
-    public function cancel(int $tableId, int $slotId): void
-    {
-        $user = auth()->user();
-
-        if (!$user instanceof User) {
-            return;
-        }
-
-        try {
-            app(BookingService::class)->cancel($tableId, $slotId, $this->bookingDate, $user);
-        } catch (BookingException $e) {
-            session()->flash('error', $e->getMessage());
-        }
-
-    }
-
     public function render()
     {
         $tables = RestaurantTable::where('restaurant_id', $this->restaurant->id)
@@ -89,16 +49,28 @@ class TableList extends Component
             ->orderBy('start_time')
             ->get();
 
+        $now = now();
+        $isToday = $this->bookingDate === $now->toDateString();
+
+        $pastSlots = collect();
+        if ($isToday) {
+            $pastSlots = $timeSlots->filter(function ($slot) use ($now) {
+                return $slot->start_time <= $now->format('H:i:s');
+            })->pluck('id');
+        }
+
         $bookings = Booking::where('restaurant_id', $this->restaurant->id)
             ->whereDate('booking_date', $this->bookingDate)
-            ->where('status', 'confirmed')
+            ->where('status', 'approved')
             ->get()
             ->keyBy(fn($b) => $b->table_id . '-' . $b->slot_id);
 
         return view('livewire.tables.table-list', [
-            'tables' => $tables,
+            'tables'    => $tables,
             'timeSlots' => $timeSlots,
-            'bookings' => $bookings,
+            'bookings'  => $bookings,
+            'pastSlots' => $pastSlots,
+            'isToday'   => $isToday,
         ]);
     }
 }
