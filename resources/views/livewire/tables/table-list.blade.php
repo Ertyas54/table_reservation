@@ -20,8 +20,15 @@
                        min="{{ now()->toDateString() }}">
             </label>
 
+            @auth
+                <a href="{{ route('bookings.create', ['restaurant' => $restaurant->id, 'date' => $bookingDate]) }}"
+                   class="btn btn--primary">
+                    + Забронировать
+                </a>
+            @endauth
+
             @if(auth()->user()->role === 'admin')
-                <a href="{{ route('tables.create', $restaurant) }}" class="btn btn--primary">
+                <a href="{{ route('tables.create', $restaurant) }}" class="btn btn--ghost">
                     + Добавить столик
                 </a>
             @endif
@@ -88,7 +95,6 @@
                         @php
                             $key = $table->id . '-' . $timeSlot->id;
                             $booking = $bookings->get($key);
-                            $isMine = $booking && $booking->user_id === auth()->id();
                             $time = Carbon::parse($timeSlot->start_time)->format('H:i')
                                   . '–'
                                   . Carbon::parse($timeSlot->end_time)->format('H:i');
@@ -98,27 +104,21 @@
 
                         <span wire:key="cell-{{ $key }}">
                             @if ($isDisabled)
-                                <span class="slot slot--disabled" title="{{ $isPast ? 'Время прошло' : 'Недоступно' }}">
+                                <span class="slot slot--disabled"
+                                      title="{{ $isPast ? 'Время прошло' : 'Недоступно' }}">
                                     {{ $time }}
                                 </span>
-                            @elseif (!$booking)
-                                <button wire:key="free-{{ $key }}"
-                                        wire:click="book({{ $table->id }}, {{ $timeSlot->id }})"
-                                        class="slot">
+                            @elseif ($booking)
+                                <span class="slot slot--taken" title="Забронировано">
                                     {{ $time }}
-                                </button>
-                            @elseif ($isMine)
-                                <button wire:key="mine-{{ $key }}"
-                                        wire:click="cancel({{ $table->id }}, {{ $timeSlot->id }})"
-                                        wire:confirm="Отменить бронь?"
-                                        class="slot slot--mine">
-                                    {{ $time }}
-                                    <span class="slot__mine-label">(моя)</span>
-                                </button>
+                                </span>
                             @else
-                                <span wire:key="taken-{{ $key }}" class="slot slot--taken">{{ $time }}</span>
+                                <span class="slot slot--free" title="Свободно">
+                                    {{ $time }}
+                                </span>
                             @endif
-                        </span>                    @empty
+                        </span>
+                    @empty
                         <span class="slots-empty">Слотов нет</span>
                     @endforelse
                 </div>
@@ -128,10 +128,10 @@
         <div class="empty-state">
             <div class="empty-state__title">Столиков пока нет</div>
             @if(auth()->user()->role === 'admin')
-            <div class="empty-state__text">Добавьте первый столик, чтобы начать</div>
-            <a href="{{ route('tables.create', $restaurant) }}" class="btn btn--primary">
-                + Добавить столик
-            </a>
+                <div class="empty-state__text">Добавьте первый столик, чтобы начать</div>
+                <a href="{{ route('tables.create', $restaurant) }}" class="btn btn--primary">
+                    + Добавить столик
+                </a>
             @endif
         </div>
     @endforelse

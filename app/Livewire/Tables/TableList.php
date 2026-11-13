@@ -42,43 +42,6 @@ class TableList extends Component
         $table->delete();
     }
 
-    public function book(int $tableId, int $slotId): void
-    {
-        $user = auth()->user();
-
-        if (!$user instanceof User) {
-            return;
-        }
-
-        try {
-            $table = RestaurantTable::where('restaurant_id', $this->restaurant->id)
-                ->findOrFail($tableId);
-
-            $slot = TimeSlot::where('restaurant_id', $this->restaurant->id)
-                ->findOrFail($slotId);
-
-            app(BookingService::class)->create($user, $table, $slot, $this->bookingDate);
-        } catch (BookingException $e) {
-            session()->flash('error', $e->getMessage());
-        }
-    }
-
-    public function cancel(int $tableId, int $slotId): void
-    {
-        $user = auth()->user();
-
-        if (!$user instanceof User) {
-            return;
-        }
-
-        try {
-            app(BookingService::class)->cancel($tableId, $slotId, $this->bookingDate, $user);
-        } catch (BookingException $e) {
-            session()->flash('error', $e->getMessage());
-        }
-
-    }
-
     public function render()
     {
         $tables = RestaurantTable::where('restaurant_id', $this->restaurant->id)
@@ -96,13 +59,13 @@ class TableList extends Component
         $pastSlots = collect();
         if ($isToday) {
             $pastSlots = $timeSlots->filter(function ($slot) use ($now) {
-                return Carbon::parse($slot->start_time)->format('H:i') <= $now->format('H:i');
+                return $slot->start_time <= $now->format('H:i:s');
             })->pluck('id');
         }
 
         $bookings = Booking::where('restaurant_id', $this->restaurant->id)
             ->whereDate('booking_date', $this->bookingDate)
-            ->where('status', 'confirmed')
+            ->where('status', 'approved')
             ->get()
             ->keyBy(fn($b) => $b->table_id . '-' . $b->slot_id);
 
@@ -111,7 +74,7 @@ class TableList extends Component
             'timeSlots' => $timeSlots,
             'bookings'  => $bookings,
             'pastSlots' => $pastSlots,
-            'isToday' => $isToday,
+            'isToday'   => $isToday,
         ]);
     }
 }

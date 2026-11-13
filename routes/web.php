@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Livewire\Bookings\BookingRequestList;
+use App\Livewire\Bookings\BookingRequests;
+use App\Livewire\Bookings\CreateBookingRequest;
 use App\Livewire\Restaurants\RestaurantForm;
 use App\Livewire\Restaurants\RestaurantList;
 use App\Livewire\Tables\TableForm;
@@ -25,6 +28,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/restaurants', RestaurantList::class)->name('restaurants.index');
     Route::get('/restaurants/{restaurant}/tables', TableList::class)->name('tables.index');
 
+    Route::get('/restaurants/{restaurant}/bookings/create', CreateBookingRequest::class)->name('bookings.create');
+    Route::get('/bookings/my', BookingRequests::class)->name('bookings.my');
+
     Route::middleware('admin')->group(function () {
         Route::get('/restaurants/create', RestaurantForm::class)->name('restaurants.create');
         Route::get('/restaurants/{restaurant}/edit', RestaurantForm::class)->name('restaurants.edit');
@@ -34,6 +40,8 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/users', UserIndex::class)->name('users.index');
         Route::get('/users/{user}/edit', UserEdit::class)->name('users.edit');
+
+        Route::get('/admin/booking-requests', BookingRequestList::class)->name('admin.booking-requests');
     });
 });
 
