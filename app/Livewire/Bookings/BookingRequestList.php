@@ -56,7 +56,6 @@ class BookingRequestList extends Component
         }
 
         if (!trim($this->rejectReason)) {
-            session()->flash('error', 'Укажите причину отказа');
             return;
         }
 
@@ -66,7 +65,7 @@ class BookingRequestList extends Component
                 $user,
                 $this->rejectReason
             );
-            session()->flash('message', 'Заявка отклонена');
+
             $this->closeRejectModal();
         } catch (BookingException $e) {
             session()->flash('error', $e->getMessage());

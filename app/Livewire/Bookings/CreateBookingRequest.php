@@ -106,7 +106,6 @@ class CreateBookingRequest extends Component
                 $this->comment ?: null,
             );
 
-            session()->flash('message', 'Заявка отправлена на одобрение');
             $this->redirectRoute('bookings.my');
         } catch (BookingException $e) {
             $this->errorMessage = $e->getMessage();

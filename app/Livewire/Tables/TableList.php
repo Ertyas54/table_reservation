@@ -2,14 +2,10 @@
 
 namespace App\Livewire\Tables;
 
-use App\Http\Exceptions\BookingException;
 use App\Models\Booking;
 use App\Models\Restaurant;
 use App\Models\RestaurantTable;
 use App\Models\TimeSlot;
-use App\Models\User;
-use App\Http\Services\BookingService;
-use Carbon\Carbon;
 use Livewire\Component;
 
 class TableList extends Component

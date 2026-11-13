@@ -19,7 +19,6 @@ class BookingRequests extends Component
 
         try {
             app(BookingService::class)->cancel($groupId, $user);
-            session()->flash('message', 'Заявка отменена');
         } catch (BookingException $e) {
             session()->flash('error', $e->getMessage());
         }
