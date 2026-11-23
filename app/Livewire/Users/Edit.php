@@ -3,6 +3,7 @@
 namespace App\Livewire\Users;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
 
@@ -57,7 +58,7 @@ class Edit extends Component
             return;
         }
         if (!empty($data['password'])) {
-            $data['password'] = $data['password'];
+            $data['password'] = Hash::make($data['password']);
         } else {
             unset($data['password']);
         }
