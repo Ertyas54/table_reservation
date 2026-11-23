@@ -133,7 +133,7 @@ class CreateBookingRequest extends Component
 
         $now = now();
         $isToday = $this->bookingDate === $now->toDateString();
-        $pastSlotIds = collect();
+        $pastSlotIds = [];
         if ($isToday) {
             $pastSlotIds = $timeSlots->filter(
                 fn($s) => $s->start_time <= $now->format('H:i:s')
