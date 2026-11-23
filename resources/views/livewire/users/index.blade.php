@@ -27,6 +27,8 @@
             <option value="">Все роли</option>
             <option value="admin">Админы</option>
             <option value="client">Клиенты</option>
+            <option value="owner">Владельцы</option>
+            <option value="manager">Менеджеры</option>
         </select>
 
         <span class="filters__count">Показано: <b>{{ $users->count() }}</b> из {{ $total }}</span>
@@ -55,7 +57,7 @@
                                 <div class="user-card__name">{{ $user->first_name }} {{ $user->last_name }}</div>
                                 <div class="user-card__role">
                                     <span class="user-card__role-dot user-card__role-dot--{{ $user->role }}"></span>
-                                    {{ $user->role === 'admin' ? 'Администратор' : 'Клиент' }}
+                                    {{ ['admin' => 'Администратор', 'owner' => 'Владелец', 'manager' => 'Менеджер', 'client' => 'Клиент'][$user->role] ?? $user->role }}
                                 </div>
                             </div>
                         </div>

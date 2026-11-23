@@ -19,7 +19,7 @@
                     </a>
                 @endauth
 
-                @if(auth()->user()->role === 'admin')
+                    @if(auth()->user()->canCreateTable($restaurant))
                     <a href="{{ route('tables.create', $restaurant) }}" class="btn btn--ghost">
                         <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
                         Добавить столик
@@ -77,7 +77,7 @@
                                 </span>
                             @endif
 
-                            @if(auth()->user()->role === 'admin')
+                                @if(auth()->user()->canManageRestaurant($restaurant))
                                 <div class="table-card__actions">
                                     <a href="{{ route('tables.edit', [$restaurant, $table]) }}" class="icon-btn icon-btn--sm" title="Редактировать">
                                         <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>

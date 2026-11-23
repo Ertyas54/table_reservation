@@ -20,6 +20,8 @@ class Restaurant extends Model
 
     protected $casts = [
         'is_active' => 'boolean',
+        'rating_avg'    => 'decimal:2',
+        'ratings_count' => 'int',
     ];
 
     public function tables() {
@@ -34,5 +36,16 @@ class Restaurant extends Model
     public function bookings()
     {
         return $this->hasMany(Booking::class);
+    }
+
+    public function ratings()
+    {
+        return $this->hasMany(RestaurantRating::class);
+    }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class)
+            ->withPivot('role')->withTimestamps();
     }
 }

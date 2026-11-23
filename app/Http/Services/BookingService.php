@@ -75,6 +75,7 @@ class BookingService
         }
 
         $groupId = (string) Str::uuid();
+        $restaurant->loadMissing('users');
 
         DB::transaction(function () use ($items, $user, $restaurant, $date, $comment, $groupId) {
             foreach ($items as $item) {
@@ -91,12 +92,29 @@ class BookingService
             }
         });
 
+        $firstBooking = Booking::forGroup($groupId)
+            ->with(['restaurant', 'slot', 'table', 'user'])
+            ->first();
+
+        if ($firstBooking) {
+            foreach ($restaurant->users as $recipient) {
+                if (in_array($recipient->pivot->role, ['owner', 'manager'], true)) {
+                    $recipient->notify(new \App\Notifications\NewBookingRequest($firstBooking));
+                }
+            }
+        }
+
         return $groupId;
     }
 
-    public function approve(string $groupId, User $admin): void
+    public function approve(string $groupId, User $actor): void
     {
-        DB::transaction(function () use ($groupId, $admin) {
+        $first = Booking::forGroup($groupId)->with('restaurant')->first();
+        if (!$first || !$actor->canManageRestaurant($first->restaurant)) {
+            throw new BookingException('Недостаточно прав');
+        }
+
+        DB::transaction(function () use ($groupId, $actor) {
             $bookings = Booking::forGroup($groupId)
                 ->where('status', 'pending')
                 ->lockForUpdate()
@@ -122,36 +140,52 @@ class BookingService
             Booking::forGroup($groupId)->update([
                 'status'      => 'approved',
                 'approved_at' => now(),
-                'approved_by' => $admin->id,
+                'approved_by' => $actor->id,
             ]);
         });
-    }
+        
+        $approved = Booking::forGroup($groupId)
+            ->with(['restaurant', 'slot', 'table', 'user'])
+            ->first();
 
-    public function reject(string $groupId, User $admin, string $reason): void
+        if ($approved && $approved->user_id !== $actor->id) {
+            $approved->user->notify(new \App\Notifications\BookingApproved($approved));
+        }
+    }
+    public function reject(string $groupId, User $actor, string $reason): void
     {
+        $first = Booking::forGroup($groupId)->with('restaurant')->first();
+        if (!$first || !$actor->canManageRestaurant($first->restaurant)) {
+            throw new BookingException('Недостаточно прав');
+        }
+
         $updated = Booking::forGroup($groupId)
             ->where('status', 'pending')
             ->update([
                 'status'        => 'rejected',
                 'admin_comment' => $reason,
-                'approved_by'   => $admin->id,
+                'approved_by'   => $actor->id,
             ]);
 
         if ($updated === 0) {
             throw new BookingException('Заявка не найдена или уже обработана');
         }
+        $booking = Booking::forGroup($groupId)->with('restaurant')->first();
+        if ($booking) {
+            $booking->user->notify(new \App\Notifications\BookingRejected($booking, $reason));
+        }
     }
 
     public function cancel(string $groupId, User $user): void
     {
-        $bookings = Booking::forGroup($groupId)->get();
+        $bookings = Booking::forGroup($groupId)->with('restaurant')->get();
 
         if ($bookings->isEmpty()) {
             throw new BookingException('Заявка не найдена');
         }
 
         $first = $bookings->first();
-        if ($first->user_id !== $user->id && $user->role !== 'admin') {
+        if ($first->user_id !== $user->id && !$user->canManageRestaurant($first->restaurant)) {
             throw new BookingException('Это чужая заявка');
         }
 

@@ -64,15 +64,48 @@
 
                 <div class="form-field">
                     <label class="form-field__label">Роль</label>
-                    <select wire:model="role"
+                    <select wire:model.live="role"
                             class="form-field__select @error('role') form-field__select--error @enderror"
                             @if($user->id === auth()->id()) disabled @endif>
                         <option value="client">Клиент</option>
                         <option value="admin">Админ</option>
+                        <option value="owner">Владелец ресторана</option>
+                        <option value="manager">Менеджер</option>
                     </select>
                     @error('role') <div class="form-field__error">{{ $message }}</div> @enderror
                 </div>
             </div>
+            @if(in_array($role, ['owner', 'manager']))
+                <div class="form-field">
+                    <div class="form-field__label-row">
+                        <label class="form-field__label">
+                            {{ $role === 'owner' ? 'Владеет ресторанами' : 'Управляет ресторанами' }}
+                        </label>
+                    </div>
+
+                    @if($allRestaurants->isEmpty())
+                        <div class="form-field__hint">Ресторанов в системе пока нет</div>
+                    @else
+                        <div class="restaurant-checklist">
+                            @foreach($allRestaurants as $r)
+                                <label class="check-row">
+                                    <input type="checkbox"
+                                           wire:model="selectedRestaurantIds"
+                                           value="{{ $r->id }}">
+                                    <span class="check-row__text">
+                            <strong>{{ $r->name }}</strong>
+                            <span class="muted">· {{ $r->city }}</span>
+                        </span>
+                                </label>
+                            @endforeach
+                        </div>
+                    @endif
+
+                    @error('selectedRestaurantIds')
+                    <div class="form-field__error">{{ $message }}</div>
+                    @enderror
+                </div>
+            @endif
 
             <div class="form-card__actions">
                 <a href="{{ route('users.index') }}" class="btn btn--ghost">Отмена</a>

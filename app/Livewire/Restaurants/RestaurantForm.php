@@ -24,6 +24,7 @@ class RestaurantForm extends Component
     public function mount(?Restaurant $restaurant = null): void
     {
         if ($restaurant && $restaurant->exists) {
+            if (!auth()->user()->canManageRestaurant($restaurant)) abort(403);
             $this->restaurant = $restaurant;
             $this->name = $restaurant->name;
             $this->description = $restaurant->description ?? '';
@@ -34,6 +35,8 @@ class RestaurantForm extends Component
             $this->opening_time = substr($restaurant->opening_time, 0, 5);
             $this->closing_time = substr($restaurant->closing_time, 0, 5);
             $this->is_active = $restaurant->is_active;
+        } else {
+            if (!auth()->user()->isAdmin()) abort(403);
         }
     }
 
@@ -57,8 +60,12 @@ class RestaurantForm extends Component
 
     public function save(TimeSlotGenerator $generator): void
     {
-        if (auth()->user()->role !== 'admin') {
-            abort(403);
+        $user = auth()->user();
+
+        if ($this->restaurant) {
+            if (!$user->canManageRestaurant($this->restaurant)) abort(403);
+        } else {
+            if (!$user->isAdmin()) abort(403);
         }
         $validated = $this->validate();
 

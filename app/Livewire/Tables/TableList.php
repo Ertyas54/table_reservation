@@ -21,7 +21,7 @@ class TableList extends Component
 
     public function delete(int $tableId): void
     {
-        if (auth()->user()->role !== 'admin') {
+        if (!auth()->user()->canManageRestaurant($this->restaurant)) {
             abort(403);
         }
         $table = RestaurantTable::where('restaurant_id', $this->restaurant->id)
