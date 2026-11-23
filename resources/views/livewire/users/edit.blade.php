@@ -1,21 +1,21 @@
-<div class="container">
+<div class="page">
     <div class="page-header">
         <div>
+            <p class="page-header__eyebrow">Администрирование</p>
             <h1 class="page-header__title">
                 Редактировать: {{ $user->first_name }} {{ $user->last_name }}
             </h1>
+            <p class="page-header__subtitle">Обновите данные и сохраните изменения</p>
         </div>
         <div class="page-header__actions">
-            <a href="{{ route('users.index') }}" class="btn btn--ghost">← К списку</a>
+            <a href="{{ route('users.index') }}" class="btn btn--ghost">
+                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+                К списку
+            </a>
         </div>
     </div>
 
-    <form wire:submit="save" class="form-card">
-        <div class="form-card__header">
-            <h2 class="form-card__title">Данные пользователя</h2>
-            <p class="form-card__subtitle">Обновите информацию и сохраните</p>
-        </div>
-
+    <form wire:submit="save" class="form-card form-card--wide">
         <div class="form-card__body">
             <div class="form-row">
                 <div class="form-field">
@@ -33,18 +33,20 @@
                 </div>
             </div>
 
-            <div class="form-field">
-                <label class="form-field__label">Email</label>
-                <input type="email" wire:model="email"
-                       class="form-field__input @error('email') form-field__input--error @enderror">
-                @error('email') <div class="form-field__error">{{ $message }}</div> @enderror
-            </div>
+            <div class="form-row">
+                <div class="form-field">
+                    <label class="form-field__label">Email</label>
+                    <input type="email" wire:model="email"
+                           class="form-field__input @error('email') form-field__input--error @enderror">
+                    @error('email') <div class="form-field__error">{{ $message }}</div> @enderror
+                </div>
 
-            <div class="form-field">
-                <label class="form-field__label">Телефон</label>
-                <input type="text" wire:model="phone"
-                       class="form-field__input @error('phone') form-field__input--error @enderror">
-                @error('phone') <div class="form-field__error">{{ $message }}</div> @enderror
+                <div class="form-field">
+                    <label class="form-field__label">Телефон</label>
+                    <input type="text" wire:model="phone"
+                           class="form-field__input @error('phone') form-field__input--error @enderror">
+                    @error('phone') <div class="form-field__error">{{ $message }}</div> @enderror
+                </div>
             </div>
 
             <div class="form-row">
@@ -73,8 +75,11 @@
             </div>
 
             <div class="form-card__actions">
-                <button type="submit" class="btn btn--primary">Сохранить</button>
                 <a href="{{ route('users.index') }}" class="btn btn--ghost">Отмена</a>
+                <button type="submit" class="btn btn--primary">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                    Сохранить
+                </button>
             </div>
         </div>
     </form>

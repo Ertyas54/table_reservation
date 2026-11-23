@@ -14,22 +14,34 @@ class TimeSlotSeeder extends Seeder
         $restaurants = Restaurant::all();
 
         foreach ($restaurants as $restaurant) {
-            $start = Carbon::parse($restaurant->opening_time);
-            $close = Carbon::parse($restaurant->closing_time);
+            $opening = Carbon::parse($restaurant->opening_time);
+            $closing = Carbon::parse($restaurant->closing_time);
 
-            if ($close->lessThanOrEqualTo($start)) {
-                $close = Carbon::parse('23:59');
+            if ($closing->lessThanOrEqualTo($opening)) {
+                $closing = Carbon::parse('23:59');
             }
 
-            while ($start->copy()->addHours(2)->lte($close)) {
-                TimeSlot::create([
-                    'restaurant_id' => $restaurant->id,
-                    'start_time'    => $start->format('H:i:s'),
-                    'end_time'      => $start->copy()->addHours(2)->format('H:i:s'),
-                    'is_active'     => true,
-                ]);
+            $cursor = $opening->copy();
 
-                $start->addHours(2);
+            while ($cursor->copy()->addHour()->lessThanOrEqualTo($closing)) {
+                $slotStart = $cursor->format('H:i:s');
+                $slotEnd = $cursor->copy()->addHour()->format('H:i:s');
+
+                $exists = TimeSlot::where('restaurant_id', $restaurant->id)
+                    ->where('start_time', $slotStart)
+                    ->where('end_time', $slotEnd)
+                    ->exists();
+
+                if (!$exists) {
+                    TimeSlot::create([
+                        'restaurant_id' => $restaurant->id,
+                        'start_time'    => $slotStart,
+                        'end_time'      => $slotEnd,
+                        'is_active'     => true,
+                    ]);
+                }
+
+                $cursor->addHour();
             }
         }
     }
