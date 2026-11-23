@@ -19,10 +19,12 @@ class TableForm extends Component
 
     public function mount(Restaurant $restaurant, ?RestaurantTable $table = null): void
     {
-        if (auth()->user()->role !== 'admin') {
-            abort(403);
+        $user = auth()->user();
+        if ($table) {
+            if (!$user->canManageRestaurant($restaurant)) abort(403);
+        } else {
+            if (!$user->canCreateTable($restaurant)) abort(403);
         }
-
         $this->restaurant = $restaurant;
 
         if ($table) {
@@ -51,6 +53,13 @@ class TableForm extends Component
 
     public function save(TimeSlotGenerator $generator): void
     {
+        $user = auth()->user();
+        if ($this->table) {
+            if (!$user->canManageRestaurant($this->restaurant)) abort(403);
+        } else {
+            if (!$user->canCreateTable($this->restaurant)) abort(403);
+        }
+
         $validated = $this->validate();
 
         if ($this->table) {

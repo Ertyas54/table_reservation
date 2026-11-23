@@ -6,6 +6,7 @@ use App\Livewire\Bookings\BookingRequests;
 use App\Livewire\Bookings\CreateBookingRequest;
 use App\Livewire\Restaurants\RestaurantForm;
 use App\Livewire\Restaurants\RestaurantList;
+use App\Livewire\Restaurants\ManageManagers;
 use App\Livewire\Tables\TableForm;
 use App\Livewire\Tables\TableList;
 use App\Livewire\Users\Edit as UserEdit;
@@ -31,17 +32,25 @@ Route::middleware('auth')->group(function () {
     Route::get('/restaurants/{restaurant}/bookings/create', CreateBookingRequest::class)->name('bookings.create');
     Route::get('/bookings/my', BookingRequests::class)->name('bookings.my');
 
-    Route::middleware('admin')->group(function () {
+    Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/restaurants/create', RestaurantForm::class)->name('restaurants.create');
-        Route::get('/restaurants/{restaurant}/edit', RestaurantForm::class)->name('restaurants.edit');
-
-        Route::get('/restaurants/{restaurant}/tables/create', TableForm::class)->name('tables.create');
-        Route::get('/restaurants/{restaurant}/tables/{table}/edit', TableForm::class)->name('tables.edit');
-
         Route::get('/users', UserIndex::class)->name('users.index');
         Route::get('/users/{user}/edit', UserEdit::class)->name('users.edit');
+    });
 
+    Route::middleware(['auth', 'role:admin,owner,manager'])->group(function () {
+        Route::get('/restaurants/{restaurant}/edit', RestaurantForm::class)->name('restaurants.edit');
+        Route::get('/restaurants/{restaurant}/tables/create', TableForm::class)->name('tables.create');
+        Route::get('/restaurants/{restaurant}/tables/{table}/edit', TableForm::class)->name('tables.edit');
+    });
+
+    Route::middleware(['auth', 'role:admin,owner,manager'])->group(function () {
         Route::get('/admin/booking-requests', BookingRequestList::class)->name('admin.booking-requests');
+    });
+
+    Route::middleware(['auth', 'role:admin,owner'])->group(function () {
+        Route::get('/restaurants/{restaurant}/managers', ManageManagers::class)
+            ->name('restaurants.managers');
     });
 });
 

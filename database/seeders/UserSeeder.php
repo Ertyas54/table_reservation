@@ -18,6 +18,18 @@ class UserSeeder extends Seeder
             'role'          => 'admin',
         ]);
 
+        User::create([
+            'first_name' => 'Олег', 'last_name' => 'Владельцев',
+            'email' => 'owner@example.com', 'phone' => '+79000000010',
+            'password' => bcrypt('password'), 'role' => 'owner',
+        ]);
+
+        User::create([
+            'first_name' => 'Михаил', 'last_name' => 'Менеджеров',
+            'email' => 'manager@example.com', 'phone' => '+79000000011',
+            'password' => bcrypt('password'), 'role' => 'manager',
+        ]);
+
         $clients = [
             ['Пётр',  'Петров',   'petr@example.com',  '+79000000002'],
             ['Анна',  'Сидорова', 'anna@example.com',  '+79000000003'],

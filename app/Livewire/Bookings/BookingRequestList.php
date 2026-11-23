@@ -17,9 +17,7 @@ class BookingRequestList extends Component
     public function approveGroup(string $groupId): void
     {
         $user = auth()->user();
-        if (!$user instanceof User || $user->role !== 'admin') {
-            abort(403);
-        }
+        if (!$user instanceof User) abort(403);
 
         try {
             app(BookingService::class)->approve($groupId, $user);
@@ -31,7 +29,9 @@ class BookingRequestList extends Component
 
     public function openRejectModal(string $groupId): void
     {
-        if (auth()->user()?->role !== 'admin') {
+        $user = auth()->user();
+        $booking = \App\Models\Booking::forGroup($groupId)->with('restaurant')->first();
+        if (!$user || !$booking || !$user->canManageRestaurant($booking->restaurant)) {
             abort(403);
         }
         $this->rejectingGroupId = $groupId;
@@ -47,9 +47,7 @@ class BookingRequestList extends Component
     public function confirmReject(): void
     {
         $user = auth()->user();
-        if (!$user instanceof User || $user->role !== 'admin') {
-            abort(403);
-        }
+        if (!$user instanceof User) abort(403);
 
         if (!$this->rejectingGroupId) {
             return;
@@ -74,8 +72,19 @@ class BookingRequestList extends Component
 
     public function render()
     {
+        $user = auth()->user();
         $query = Booking::with(['user', 'restaurant', 'table', 'slot'])
             ->orderByDesc('created_at');
+
+        if (!$user->isAdmin()) {
+            $restaurantIds = $user->managedRestaurants()->pluck('restaurants.id');
+            if ($restaurantIds->isEmpty()) {
+                return view('livewire.bookings.booking-request-list', [
+                    'groups' => collect(),
+                ]);
+            }
+            $query->whereIn('restaurant_id', $restaurantIds);
+        }
 
         if ($this->statusFilter) {
             $query->where('status', $this->statusFilter);

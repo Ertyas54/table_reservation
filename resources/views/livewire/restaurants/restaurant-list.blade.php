@@ -124,6 +124,45 @@
                             @endif
                         </div>
 
+                        @php
+                            $canRate = !in_array($restaurant->id, $ownedRestaurantIds, true);
+                            $avgRounded = (int) round((float) $restaurant->rating_avg);
+                        @endphp
+
+                        <div class="restaurant-card__rating" x-data="{ hover: 0 }">
+                            <div class="rating-row" @mouseleave="hover = 0">
+                                @for($i = 1; $i <= 5; $i++)
+                                    @if($canRate)
+                                        <button type="button"
+                                                @mouseenter="hover = {{ $i }}"
+                                                wire:click="rate({{ $restaurant->id }}, {{ $i }})"
+                                                class="rating-star rating-star--interactive"
+                                                :class="hover > 0
+                            ? (hover >= {{ $i }} ? 'rating-star--preview' : '')
+                            : ({{ $avgRounded }} >= {{ $i }} ? 'rating-star--filled' : '')"
+                                                title="Оценить на {{ $i }}">
+                                            ★
+                                        </button>
+                                    @else
+                                        <span class="rating-star {{ $avgRounded >= $i ? 'rating-star--filled' : '' }}">★</span>
+                                    @endif
+                                @endfor
+
+                                <span class="rating-value" x-show="hover === 0" x-cloak>
+            {{ number_format((float) $restaurant->rating_avg, 1) }}
+        </span>
+                                <span class="rating-count" x-show="hover === 0" x-cloak>
+            ({{ $restaurant->ratings_count }})
+        </span>
+
+                                @if($canRate)
+                                    <span class="rating-hint" x-show="hover > 0" x-cloak>
+                Нажмите на рейтинг, чтобы задать оценку
+            </span>
+                                @endif
+                            </div>
+                        </div>
+
                         <div class="restaurant-card__footer">
                             @if ($isDisabled)
                                 <span class="slot slot--disabled" title="Недоступно">
@@ -136,10 +175,24 @@
                                 </a>
                             @endif
 
-                            @if(auth()->user()->role === 'admin')
+                                @if(auth()->user()->canManageRestaurant($restaurant))
+                                    @if(auth()->user()->isAdmin() || auth()->user()->ownsRestaurant($restaurant))
+                                        <a href="{{ route('restaurants.managers', $restaurant) }}"
+                                           class="icon-btn"
+                                           title="Управление менеджерами">
+                                            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                                                <circle cx="9" cy="7" r="4"/>
+                                                <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                                                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                            </svg>
+                                        </a>
+                                    @endif
                                 <a href="{{ route('restaurants.edit', $restaurant) }}" class="icon-btn" title="Редактировать">
                                     <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
                                 </a>
+                                @endif
+                                @if(auth()->user()->isAdmin())
                                 <button wire:click="delete({{ $restaurant->id }})"
                                         wire:confirm="Удалить ресторан?"
                                         class="icon-btn icon-btn--danger"
